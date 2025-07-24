@@ -22,7 +22,9 @@ const dbConnection = () => {
     return sequelize
 
 }
-const models = AllModal(dbConnection())
+
+const sequelizeInstance = dbConnection();
+const models = AllModal(sequelizeInstance)
 
 Object.values(models).forEach(model => {
     if (model?.association) {
@@ -30,4 +32,4 @@ Object.values(models).forEach(model => {
     }
 })
 
-export const Database = { ...models, database: dbConnection() }
+export const Database = { ...models, database: sequelizeInstance }

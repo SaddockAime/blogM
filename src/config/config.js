@@ -10,7 +10,7 @@ const getPrefix = () => {
 
 const databaseConfig = () => {
   const env = getPrefix();
-  console.log(process.env[`${env}_USERNAME`])
+  // console.log(process.env[`${env}_USERNAME`])
   return {
     username: process.env[`${env}_USERNAME`] || '',
     database: process.env[`${env}_DATABASE`] || '',

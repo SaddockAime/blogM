@@ -5,7 +5,7 @@ interface UserAttribute {
     name: string,
     email: string,
     gender: 'male' | 'female' | 'other'
-    role: string
+    role: 'admin' | 'user'
     password: string
     createdAt?: Date,
     updatedAt?: Date,
@@ -14,15 +14,16 @@ interface UserAttribute {
     comments?: any[];
     likes?: any[];
 }
-export interface UserCreationAttribute extends Omit<UserAttribute, 'id'> {
-    id?: string
+export interface UserCreationAttribute extends Omit<UserAttribute, 'id' | 'role'> {
+    id?: string;
+    role?: string;
 }
 
 export class User extends Model<UserAttribute, UserCreationAttribute> implements UserAttribute {
     public id!: string;
     public email!: string;
     public password!: string;
-    public role!: string;
+    public role!: 'admin' | 'user';
     public gender!: "male" | "female" | "other";
     public updatedAt!: Date;
     public deletedAt: null = null;
@@ -84,6 +85,10 @@ export const UserModal = (sequelize: Sequelize) => {
         },
         role: {
             type: DataTypes.STRING,
+            defaultValue: 'user',
+            validate: {
+                isIn: [['user', 'admin']]
+            },
             allowNull: false
         },
         gender: {

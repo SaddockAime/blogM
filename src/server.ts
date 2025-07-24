@@ -1,10 +1,13 @@
 import express from "express";
 import { config } from 'dotenv';
+import { Database } from "./database";
+import { routers } from "./routes";
 
 config();
 
 const app = express();
 app.use(express.json());
+app.use(routers);
 
 
 app.use((req, res) => {
@@ -17,6 +20,10 @@ app.use((req, res) => {
 
 const port = parseInt(process.env.PORT as string) || 5500;
 
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
-});
+Database.database.authenticate().then(() => {
+    app.listen(port, () => {
+      console.log(`Server running on port ${port}`);
+    });
+  }).catch((error) => {
+    console.error("Database connection failed:", error);
+    });

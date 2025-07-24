@@ -1,12 +1,15 @@
 import { Sequelize, Model, DataTypes } from "sequelize";
+import { User } from "./User";
+import { Like } from "./Like";
+import { Comment } from "./Comment";
 
 interface BlogAttribute {
     id: string;
     title: string;
     slug: string;
-    description?: string;
+    description: string;
     content: string;
-    blog_image_url?: string;
+    blog_image_url: string;
     author: string;
     isPublished: boolean;
     createdAt?: Date;
@@ -14,7 +17,6 @@ interface BlogAttribute {
     deletedAt?: Date | null;
     comments?: any[];
     likes?: any[];
-    authorDetails?: any;
 }
 
 export interface BlogCreationAttribute extends Omit<BlogAttribute, 'id'> {
@@ -25,19 +27,18 @@ export class Blog extends Model<BlogAttribute, BlogCreationAttribute> implements
     public id!: string;
     public title!: string;
     public slug!: string;
-    public description?: string;
+    public description!: string;
     public content!: string;
-    public blog_image_url?: string;
+    public blog_image_url!: string;
     public author!: string;
     public isPublished!: boolean;
     public createdAt!: Date;
     public updatedAt!: Date;
     public deletedAt?: Date | null;
-    public comments?: any[];
-    public likes?: any[];
-    public authorDetails?: any;
+    public comments?: typeof Comment[];
+    public likes?: typeof Like[];
 
-    public association(models: any) {
+    public association(models: { User: typeof User , Comment: typeof Comment, Like: typeof Like }) {
         Blog.belongsTo(models.User, {
             foreignKey: 'author',
             as: 'author'
@@ -89,7 +90,7 @@ export const BlogModel = (sequelize: Sequelize) => {
         },
         description: {
             type: DataTypes.TEXT,
-            allowNull: true
+            allowNull: false
         },
         content: {
             type: DataTypes.TEXT,
@@ -97,7 +98,7 @@ export const BlogModel = (sequelize: Sequelize) => {
         },
         blog_image_url: {
             type: DataTypes.STRING,
-            allowNull: true
+            allowNull: false
         },
         author: {
             type: DataTypes.UUID,
