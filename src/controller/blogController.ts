@@ -14,7 +14,38 @@ interface IRequestBlog extends IRequestUser {
 export const getAllBlogs = async (req: Request, res: Response) => {
     try {
        
-        const blogs = await Database.Blog.findAll({})
+        const blogs = await Database.Blog.findAll({
+            include: [
+                {
+                    model: Database.User,
+                    as: 'authorUser',
+                    attributes: ['id', 'name']
+                },
+                {
+                    model: Database.Comment,
+                    as: 'comments',
+                    attributes: ['author', 'content'],
+                    include: [
+                        {
+                            model: Database.User,
+                            as: 'authorUser',
+                            attributes: ['id', 'name']
+                        }
+                    ]
+                },
+                {
+                    model: Database.Like,
+                    as: 'likes',
+                    include: [
+                        {
+                            model: Database.User,
+                            as: 'userInfo',
+                            attributes: ['id', 'name']
+                        }
+                    ]
+                }
+            ]
+        })
 
         if (!blogs || blogs.length === 0) {
             return ResponseService({
@@ -48,7 +79,38 @@ export const getAllBlogs = async (req: Request, res: Response) => {
 
 export const getBlog = async (req: Request, res: Response) => {
     try {
-        const blog = await Database.Blog.findByPk(req.params.id);
+        const blog = await Database.Blog.findByPk(req.params.id, {
+            include: [
+                {
+                    model: Database.User,
+                    as: 'authorUser',
+                    attributes: ['id', 'name']
+                },
+                {
+                    model: Database.Comment,
+                    as: 'comments',
+                    attributes: ['author', 'content'],
+                    include: [
+                        {
+                            model: Database.User,
+                            as: 'authorUser',
+                            attributes: ['id', 'name']
+                        }
+                    ]
+                },
+                {
+                    model: Database.Like,
+                    as: 'likes',
+                    include: [
+                        {
+                            model: Database.User,
+                            as: 'userInfo',
+                            attributes: ['id', 'name']
+                        }
+                    ]
+                }
+            ]
+        });
 
         if(!blog) {
             return ResponseService({

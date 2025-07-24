@@ -7,6 +7,9 @@ interface UserAttribute {
     gender: 'male' | 'female' | 'other'
     role: 'admin' | 'user'
     password: string
+    googleId?: string
+    profilePicture?: string
+    provider?: string
     createdAt?: Date,
     updatedAt?: Date,
     deletedAt?: null
@@ -14,15 +17,19 @@ interface UserAttribute {
     comments?: any[];
     likes?: any[];
 }
-export interface UserCreationAttribute extends Omit<UserAttribute, 'id' | 'role'> {
+export interface UserCreationAttribute extends Omit<UserAttribute, 'id' | 'role' | 'password'> {
     id?: string;
     role?: string;
+    password?: string;
 }
 
 export class User extends Model<UserAttribute, UserCreationAttribute> implements UserAttribute {
     public id!: string;
     public email!: string;
     public password!: string;
+    public googleId?: string;
+    public profilePicture?: string;
+    public provider?: string;
     public role!: 'admin' | 'user';
     public gender!: "male" | "female" | "other";
     public updatedAt!: Date;
@@ -33,7 +40,7 @@ export class User extends Model<UserAttribute, UserCreationAttribute> implements
     public comments?: any[];
     public likes?: any[];
 
-    public association(models: any) {
+    static associate(models: any) {
         User.hasMany(models.Blog, {
             foreignKey: 'author',
             as: 'blogs'
@@ -49,6 +56,7 @@ export class User extends Model<UserAttribute, UserCreationAttribute> implements
             as: 'likes'
         });
     }
+    
     public toJSON(): object | UserAttribute {
         return {
             id: this.id,
@@ -81,7 +89,20 @@ export const UserModal = (sequelize: Sequelize) => {
         },
         password: {
             type: DataTypes.STRING,
-            allowNull: false
+            allowNull: true
+        },
+        googleId: {
+            type: DataTypes.STRING,
+            allowNull: true,
+            unique: true
+        },
+        profilePicture: {
+            type: DataTypes.STRING,
+            allowNull: true
+        },
+        provider: {
+            type: DataTypes.STRING,
+            allowNull: true,
         },
         role: {
             type: DataTypes.STRING,

@@ -27,7 +27,7 @@ module.exports = {
       },
       password: {
         type: Sequelize.STRING,
-        allowNull: false
+        allowNull: true
       },
       role: {
         type: Sequelize.STRING,
@@ -36,6 +36,19 @@ module.exports = {
       gender: {
         type: Sequelize.ENUM('male', 'female', 'other'),
         allowNull: false
+      },
+      googleId: {
+        type: Sequelize.STRING,
+        allowNull: true,
+        unique: true
+      },
+      profilePicture: {
+        type: Sequelize.STRING,
+        allowNull: true
+      },
+      provider: {
+        type: Sequelize.STRING,
+        allowNull: true
       },
       createdAt: {
         allowNull: false,

@@ -19,10 +19,10 @@ export class Like extends Model<LikeAttribute, LikeCreationAttribute> implements
     public createdAt!: Date;
     public updatedAt!: Date;
 
-    public association(models: any) {
+    static associate(models: any) {
         Like.belongsTo(models.User, {
             foreignKey: 'user',
-            as: 'user'
+            as: 'userInfo'
         });
         
         Like.belongsTo(models.Blog, {
@@ -32,13 +32,8 @@ export class Like extends Model<LikeAttribute, LikeCreationAttribute> implements
     }
 
     public toJSON(): object | LikeAttribute {
-        return {
-            id: this.id,
-            user: this.user,
-            blogId: this.blogId,
-            createdAt: this.createdAt,
-            updatedAt: this.updatedAt
-        };
+        const values = Object.assign({}, this.get());
+        return values;
     }
 }
 

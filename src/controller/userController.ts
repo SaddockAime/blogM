@@ -2,14 +2,20 @@ import { Request, Response } from "express";
 import { ResponseService } from "../utils/response";
 import { AddUserInterface, UserInterface } from "../types/userInterface";
 import { Database } from "../database";
-import { hashPassword, comparePassword, generateToken } from "../utils/helper";
+import { IRequestUser } from "../middleware/authMiddleware";
+import { 
+    hashPassword, 
+    comparePassword, 
+    generateToken,
+    destroyToken
+} from "../utils/helper";
 
-interface IRequestUser extends Request {
+interface IRequestUserData extends Request {
     body: AddUserInterface;
 }
 
 
-export const addUser = async (req: IRequestUser, res: Response) => {
+export const addUser = async (req: IRequestUserData, res: Response) => {
     try {
         const { name, email, password, gender } = req.body;
 
@@ -50,7 +56,7 @@ export const addUser = async (req: IRequestUser, res: Response) => {
     }
 }
 
-export const loginUser = async (req: IRequestUser, res: Response) => {
+export const loginUser = async (req: IRequestUserData, res: Response) => {
     try {
         const { email, password } = req.body;
 
@@ -77,7 +83,7 @@ export const loginUser = async (req: IRequestUser, res: Response) => {
             });
         }
 
-        const token = generateToken({ id: user.id, email: user.email, role: user.role });
+        const token = await generateToken({ id: user.id, email: user.email, role: user.role });
 
         ResponseService({
             data: { token },
@@ -90,6 +96,39 @@ export const loginUser = async (req: IRequestUser, res: Response) => {
         const { message, stack } = err as Error;
         console.error('Error logging in user:', { message, stack });
 
+        ResponseService({
+            data: { message, stack },
+            status: 500,
+            success: false,
+            res
+        });
+    }
+}
+
+export const logoutUser = async (req: IRequestUser, res: Response) => {
+    try {
+        const token = req.token;
+        
+        if (!token) {
+            return ResponseService({
+                data: null,
+                status: 400,
+                success: false,
+                message: "No token found",
+                res
+            });
+        }
+        await destroyToken(token);
+
+        ResponseService({
+            data: null,
+            status: 200,
+            success: true,
+            message: "Logout successful",
+            res
+        });
+    } catch (err) {
+        const { message, stack } = err as Error;
         ResponseService({
             data: { message, stack },
             status: 500,

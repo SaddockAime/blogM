@@ -1,20 +1,21 @@
 import { Request, Response, NextFunction } from "express";
 import { ResponseService } from "../utils/response";
-import { secretKey } from "../utils/helper";
-import { JwtPayload } from "jsonwebtoken";
-import jwt from "jsonwebtoken"
+import { verifyToken } from "../utils/helper";
 
-interface jwtExtendPayload extends JwtPayload {
-    id: string;
-    email: string;
-    role: string;
+interface jwtExtendPayload {
+    id?: string;
+    email?: string;
+    role?: string;
+    iat?: number;
+    exp?: number;
 }
 
 export interface IRequestUser extends Request {
-    user?: jwtExtendPayload;
+    user?: jwtExtendPayload
+    token?: string;
 }
 
-export const authMiddleware = (req: IRequestUser, res: Response, next: NextFunction) => {
+export const authMiddleware = async (req: IRequestUser, res: Response, next: NextFunction) => {
     try {
         const token = req.headers.authorization?.split(" ")[1];
         if (!token) {
@@ -27,7 +28,7 @@ export const authMiddleware = (req: IRequestUser, res: Response, next: NextFunct
             });
         }
 
-        const user = jwt.verify(token as string, secretKey) as jwtExtendPayload;
+        const user = await verifyToken(token) as jwtExtendPayload;
         if (!user) {
             return ResponseService({
                 data: null,
@@ -39,27 +40,27 @@ export const authMiddleware = (req: IRequestUser, res: Response, next: NextFunct
         }
 
         req.user = user;
+        req.token = token;
         next();
         
     } catch (error) {
-        //console.error('Authentication error:', error);
         const { message, stack } = error as Error;
-        ResponseService({
+        return ResponseService({
             data: { message, stack },
-            status: 500,
+            status: 401,
             success: false,
+            message: "Invalid authentication token",
             res
         });
-        
     }
 }
 
 export const checkRole = (allowedRoles: string[]) => {
     return (req: IRequestUser, res: Response, next: NextFunction) => {
         try {
-            const user = req.user;
+            const user = req?.user;
 
-            if (!user || !allowedRoles.includes(user.role)) {
+            if (!user || !user.role || !allowedRoles.includes(user.role)) {
                 return ResponseService({
                     data: null,
                     status: 403,

@@ -14,7 +14,7 @@ import multer from "multer";
 const uploadMiddleware = multer({storage})
 const blogRouter = Router();
 
-blogRouter.get('/blogs', getAllBlogs);
+blogRouter.get('/blogs', authMiddleware, getAllBlogs);
 
 blogRouter.get('/blogs/:id',
     ValidationMiddleware({ type: 'params', schema: BlogParamsSchema, refType: 'joi' }),

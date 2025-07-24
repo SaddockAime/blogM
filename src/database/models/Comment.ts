@@ -23,10 +23,10 @@ export class Comment extends Model<CommentAttribute, CommentCreationAttribute> i
     public updatedAt!: Date;
     public deletedAt?: Date | null;
 
-    public association(models: any) {
+    static associate(models: any) {
         Comment.belongsTo(models.User, {
             foreignKey: 'author',
-            as: 'author'
+            as: 'authorUser'
         });
         
         Comment.belongsTo(models.Blog, {
@@ -36,15 +36,8 @@ export class Comment extends Model<CommentAttribute, CommentCreationAttribute> i
     }
 
     public toJSON(): object | CommentAttribute {
-        return {
-            id: this.id,
-            content: this.content,
-            author: this.author,
-            blogId: this.blogId,
-            createdAt: this.createdAt,
-            updatedAt: this.updatedAt,
-            deletedAt: this.deletedAt
-        };
+        const values = Object.assign({}, this.get());
+        return values;
     }
 }
 

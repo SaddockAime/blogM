@@ -38,10 +38,10 @@ export class Blog extends Model<BlogAttribute, BlogCreationAttribute> implements
     public comments?: typeof Comment[];
     public likes?: typeof Like[];
 
-    public association(models: { User: typeof User , Comment: typeof Comment, Like: typeof Like }) {
+    static associate(models: { User: typeof User, Comment: typeof Comment, Like: typeof Like }) {
         Blog.belongsTo(models.User, {
             foreignKey: 'author',
-            as: 'author'
+            as: 'authorUser'
         });
 
         Blog.hasMany(models.Comment, {
@@ -56,19 +56,8 @@ export class Blog extends Model<BlogAttribute, BlogCreationAttribute> implements
     }
 
     public toJSON(): object | BlogAttribute {
-        return {
-            id: this.id,
-            title: this.title,
-            slug: this.slug,
-            description: this.description,
-            content: this.content,
-            blog_image_url: this.blog_image_url,
-            author: this.author,
-            isPublished: this.isPublished,
-            createdAt: this.createdAt,
-            updatedAt: this.updatedAt,
-            deletedAt: this.deletedAt
-        };
+        const values = Object.assign({}, this.get());
+        return values;
     }
 }
 
