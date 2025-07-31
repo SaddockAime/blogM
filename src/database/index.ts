@@ -28,7 +28,7 @@ const models = AllModal(sequelizeInstance)
 
 // Object.values(models).forEach(model => {
 //     if (model?.association) {
-//         model.associate(model)
+//         model.associate(models)
 //     }
 // });
 

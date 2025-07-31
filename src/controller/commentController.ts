@@ -45,8 +45,7 @@ export const addComment = async (req: IRequestComment, res: Response) => {
     try {
         const blogId = req.params.id;
         const { content } = req.body;
-        const id = req?.user?.id as string
-        const user = await Database.User.findByPk(id)
+        const id = req.user?.id as string
 
         const blog = await Database.Blog.findByPk(blogId)
         if(!blog) {
@@ -55,16 +54,6 @@ export const addComment = async (req: IRequestComment, res: Response) => {
                 status: 404,
                 success: false,
                 message: "Blog not found",
-                res
-            });
-        }
-
-        if (!user) {
-            return ResponseService({
-                data: null,
-                status: 404,
-                success: false,
-                message: "User not found",
                 res
             });
         }
@@ -85,7 +74,6 @@ export const addComment = async (req: IRequestComment, res: Response) => {
         });
     } catch (error) {
         const { message, stack } = error as Error;
-        console.log('Error adding comment:', { message, stack });
         ResponseService({
             data: { message, stack },
             status: 500,

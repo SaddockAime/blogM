@@ -48,7 +48,7 @@ export const verifyToken = async (token: string): Promise<any> => {
     }
 }
 
-export const destroyToken = async (token: string): Promise<void> => {
+export const destroyToken = async (token: string | undefined): Promise<void> => {
     try {
         
         await redis.setEx(`blacklist:${token}`, 24 * 60 * 60, 'true');

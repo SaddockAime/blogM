@@ -46,3 +46,5 @@ Database.database.authenticate().then(() => {
   }).catch((error) => {
     console.error("Database connection failed:", error);
 });
+
+export { app }

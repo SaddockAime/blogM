@@ -66,8 +66,6 @@ export const getAllBlogs = async (req: Request, res: Response) => {
         });
     } catch (err) {
         const { message, stack } = err as Error;
-        console.error('Error getting all blogs:', { message, stack });
-        
         ResponseService({
             data: { message, stack },
             status: 500,
@@ -131,8 +129,6 @@ export const getBlog = async (req: Request, res: Response) => {
         });
     } catch (err) {
         const { message, stack } = err as Error;
-        console.error('Error getting blog:', { message, stack });
-        
         ResponseService({
             data: { message, stack },
             status: 500,
@@ -146,7 +142,7 @@ export const createBlog = async (req: IRequestBlog, res: Response) => {
     try {
         const { file } = req;
         
-        const id = req?.user?.id as string;
+        const id = req.user?.id as string;
         const author = await Database.User.findByPk(id);
        
         const { title, description, isPublished, content } = req.body;
@@ -158,7 +154,6 @@ export const createBlog = async (req: IRequestBlog, res: Response) => {
               image_url = await uploadFile(file as Express.Multer.File);
             } catch (err) {
               const { message, stack } = err as Error;
-              console.error("Error adding image blog:", { message, stack });
               ResponseService({
                 data: { message, stack },
                 status: 500,
@@ -199,8 +194,6 @@ export const createBlog = async (req: IRequestBlog, res: Response) => {
         });
     } catch (err) {
         const { message, stack } = err as Error;
-        console.error('Error creating blog:', { message, stack });
-        
         ResponseService({
             data: { message, stack },
             status: 500,
@@ -237,8 +230,6 @@ export const updateBlog = async (req: Request, res: Response) => {
         });
     } catch (err) {
         const { message, stack } = err as Error;
-        console.error('Error updating blog:', { message, stack });
-        
         ResponseService({
             data: { message, stack },
             status: 500,
@@ -275,8 +266,6 @@ export const deleteBlog = async (req: Request, res: Response) => {
         });
     } catch (err) {
         const { message, stack } = err as Error;
-        console.error('Error deleting blog:', { message, stack });
-        
         ResponseService({
             data: { message, stack },
             status: 500,

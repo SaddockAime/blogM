@@ -14,44 +14,44 @@ module.exports = {
      * }], {});
     */
     
-    const [users] = await queryInterface.sequelize.query(
-      'SELECT id FROM users'
-    )
+    // const [users] = await queryInterface.sequelize.query(
+    //   'SELECT id FROM users'
+    // )
     
-    const [blogs] = await queryInterface.sequelize.query(
-      'SELECT id FROM blogs WHERE "isPublished" = true'
-    )
+    // const [blogs] = await queryInterface.sequelize.query(
+    //   'SELECT id FROM blogs WHERE "isPublished" = true'
+    // )
     
-    await queryInterface.bulkInsert('likes', [
-      {
-        id: uuidv4(),
-        user: users[0] ? users[0].id : uuidv4(),
-        blogId: blogs[0] ? blogs[0].id : uuidv4(),
-        createdAt: new Date(),
-        updatedAt: new Date()
-      },
-      {
-        id: uuidv4(),
-        user: users[1] ? users[1].id : uuidv4(),
-        blogId: blogs[0] ? blogs[0].id : uuidv4(),
-        createdAt: new Date(),
-        updatedAt: new Date()
-      },
-      {
-        id: uuidv4(),
-        user: users[2] ? users[2].id : uuidv4(),
-        blogId: blogs[1] ? blogs[1].id : uuidv4(),
-        createdAt: new Date(),
-        updatedAt: new Date()
-      },
-      {
-        id: uuidv4(),
-        user: users[0] ? users[0].id : uuidv4(),
-        blogId: blogs[1] ? blogs[1].id : uuidv4(),
-        createdAt: new Date(),
-        updatedAt: new Date()
-      }
-    ], {});
+    // await queryInterface.bulkInsert('likes', [
+    //   {
+    //     id: uuidv4(),
+    //     user: users[0] ? users[0].id : uuidv4(),
+    //     blogId: blogs[0] ? blogs[0].id : uuidv4(),
+    //     createdAt: new Date(),
+    //     updatedAt: new Date()
+    //   },
+    //   {
+    //     id: uuidv4(),
+    //     user: users[1] ? users[1].id : uuidv4(),
+    //     blogId: blogs[0] ? blogs[0].id : uuidv4(),
+    //     createdAt: new Date(),
+    //     updatedAt: new Date()
+    //   },
+    //   {
+    //     id: uuidv4(),
+    //     user: users[2] ? users[2].id : uuidv4(),
+    //     blogId: blogs[1] ? blogs[1].id : uuidv4(),
+    //     createdAt: new Date(),
+    //     updatedAt: new Date()
+    //   },
+    //   {
+    //     id: uuidv4(),
+    //     user: users[0] ? users[0].id : uuidv4(),
+    //     blogId: blogs[1] ? blogs[1].id : uuidv4(),
+    //     createdAt: new Date(),
+    //     updatedAt: new Date()
+    //   }
+    // ], {});
   },
 
   async down(queryInterface, Sequelize) {

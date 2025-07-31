@@ -45,8 +45,6 @@ export const addUser = async (req: IRequestUserData, res: Response) => {
         });
     } catch (err) {
         const { message, stack } = err as Error;
-        console.error('Error creating user:', { message, stack });
-        
         ResponseService({
             data: { message, stack },
             status: 500,
@@ -94,8 +92,6 @@ export const loginUser = async (req: IRequestUserData, res: Response) => {
         });
     } catch (err) {
         const { message, stack } = err as Error;
-        console.error('Error logging in user:', { message, stack });
-
         ResponseService({
             data: { message, stack },
             status: 500,
@@ -109,15 +105,6 @@ export const logoutUser = async (req: IRequestUser, res: Response) => {
     try {
         const token = req.token;
         
-        if (!token) {
-            return ResponseService({
-                data: null,
-                status: 400,
-                success: false,
-                message: "No token found",
-                res
-            });
-        }
         await destroyToken(token);
 
         ResponseService({

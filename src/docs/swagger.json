@@ -92,7 +92,7 @@
       },
       "Blog": {
         "type": "object",
-        "required": ["title", "content"],
+        "required": ["title", "description", "content", "isPublished"],
         "properties": {
           "id": {
             "type": "string",
@@ -101,9 +101,14 @@
           },
           "title": {
             "type": "string",
-            "minLength": 5,
+            "minLength": 1,
             "maxLength": 200,
             "description": "Title of the blog post"
+          },
+          "description": {
+            "type": "string",
+            "minLength": 20,
+            "description": "Description of the blog post"
           },
           "content": {
             "type": "string",
@@ -114,15 +119,19 @@
             "type": "string",
             "description": "URL-friendly version of the title"
           },
-          "image": {
+          "blog_image_url": {
             "type": "string",
             "format": "uri",
             "description": "Featured image URL"
           },
-          "authorId": {
+          "author": {
             "type": "string",
             "format": "uuid",
             "description": "ID of the blog author"
+          },
+          "isPublished": {
+            "type": "boolean",
+            "description": "Whether the blog is published"
           },
           "createdAt": {
             "type": "string",
@@ -136,30 +145,62 @@
       },
       "Comment": {
         "type": "object",
-        "required": ["message"],
+        "required": ["content"],
         "properties": {
           "id": {
             "type": "string",
             "format": "uuid",
             "description": "Unique identifier for the comment"
           },
-          "message": {
+          "content": {
             "type": "string",
             "minLength": 1,
             "maxLength": 500,
-            "description": "Comment message"
+            "description": "Comment content"
           },
           "blogId": {
             "type": "string",
             "format": "uuid",
             "description": "ID of the blog being commented on"
           },
-          "userId": {
+          "author": {
             "type": "string",
             "format": "uuid",
             "description": "ID of the comment author"
           },
           "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "Like": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Unique identifier for the like"
+          },
+          "user": {
+            "type": "string",
+            "format": "uuid",
+            "description": "ID of the user who liked the blog"
+          },
+          "blogId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "ID of the blog being liked"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
             "type": "string",
             "format": "date-time"
           }
@@ -246,18 +287,27 @@
       },
       "CreateBlogRequest": {
         "type": "object",
-        "required": ["title", "content"],
+        "required": ["title", "description", "content", "isPublished"],
         "properties": {
           "title": {
             "type": "string",
-            "minLength": 5,
+            "minLength": 1,
             "maxLength": 200,
             "example": "My First Blog Post"
+          },
+          "description": {
+            "type": "string",
+            "minLength": 20,
+            "example": "This is a detailed description of my first blog post with more than 20 characters"
           },
           "content": {
             "type": "string",
             "minLength": 10,
             "example": "This is the content of my first blog post..."
+          },
+          "isPublished": {
+            "type": "boolean",
+            "example": true
           }
         }
       },
@@ -266,22 +316,31 @@
         "properties": {
           "title": {
             "type": "string",
-            "minLength": 5,
+            "minLength": 1,
             "maxLength": 200,
             "example": "Updated Blog Title"
+          },
+          "description": {
+            "type": "string",
+            "minLength": 20,
+            "example": "Updated detailed description of the blog post with more than 20 characters"
           },
           "content": {
             "type": "string",
             "minLength": 10,
             "example": "Updated content for the blog post..."
+          },
+          "isPublished": {
+            "type": "boolean",
+            "example": false
           }
         }
       },
       "CreateCommentRequest": {
         "type": "object",
-        "required": ["message"],
+        "required": ["content"],
         "properties": {
-          "message": {
+          "content": {
             "type": "string",
             "minLength": 1,
             "maxLength": 500,
@@ -308,6 +367,10 @@
     {
       "name": "Comments",
       "description": "Comment management operations"
+    },
+    {
+      "name": "Likes",
+      "description": "Like management operations"
     }
   ],
   "paths": {
@@ -647,18 +710,27 @@
             "multipart/form-data": {
               "schema": {
                 "type": "object",
-                "required": ["title", "content"],
+                "required": ["title", "description", "content", "isPublished"],
                 "properties": {
                   "title": {
                     "type": "string",
-                    "minLength": 5,
+                    "minLength": 1,
                     "maxLength": 200,
                     "example": "My New Blog Post"
+                  },
+                  "description": {
+                    "type": "string",
+                    "minLength": 20,
+                    "example": "This is a detailed description of my new blog post with more than 20 characters"
                   },
                   "content": {
                     "type": "string",
                     "minLength": 10,
                     "example": "This is the content of my new blog post..."
+                  },
+                  "isPublished": {
+                    "type": "boolean",
+                    "example": true
                   },
                   "image": {
                     "type": "string",
@@ -1030,6 +1102,210 @@
           },
           "404": {
             "description": "Blog not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/blogs/{id}/like": {
+      "post": {
+        "tags": ["Likes"],
+        "summary": "Toggle like on a blog post",
+        "description": "Like a blog post if not already liked, or unlike it if already liked (toggle functionality)",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Blog ID to toggle like"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Blog liked successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/Like"
+                        }
+                      }
+                    }
+                  ]
+                },
+                "example": {
+                  "success": true,
+                  "status": 201,
+                  "message": "Blog liked successfully",
+                  "data": {
+                    "id": "123e4567-e89b-12d3-a456-426614174000",
+                    "user": "456e7890-e89b-12d3-a456-426614174000",
+                    "blogId": "789e0123-e89b-12d3-a456-426614174000",
+                    "createdAt": "2025-01-01T00:00:00Z",
+                    "updatedAt": "2025-01-01T00:00:00Z"
+                  }
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Blog unliked successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                },
+                "example": {
+                  "success": true,
+                  "status": 200,
+                  "message": "Blog unliked successfully",
+                  "data": null
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Blog not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/blogs/{id}/likes": {
+      "get": {
+        "tags": ["Likes"],
+        "summary": "Get all likes for a blog",
+        "description": "Retrieve all likes for a specific blog post with user information",
+        "security": [],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Blog ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Likes retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "object",
+                          "properties": {
+                            "likes": {
+                              "type": "array",
+                              "items": {
+                                "allOf": [
+                                  {
+                                    "$ref": "#/components/schemas/Like"
+                                  },
+                                  {
+                                    "type": "object",
+                                    "properties": {
+                                      "userInfo": {
+                                        "type": "object",
+                                        "properties": {
+                                          "id": {
+                                            "type": "string",
+                                            "format": "uuid"
+                                          },
+                                          "name": {
+                                            "type": "string"
+                                          },
+                                          "email": {
+                                            "type": "string",
+                                            "format": "email"
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
+                                ]
+                              }
+                            },
+                            "count": {
+                              "type": "integer",
+                              "description": "Total number of likes"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                },
+                "example": {
+                  "success": true,
+                  "status": 200,
+                  "message": "Likes retrieved successfully",
+                  "data": {
+                    "likes": [
+                      {
+                        "id": "123e4567-e89b-12d3-a456-426614174000",
+                        "user": "456e7890-e89b-12d3-a456-426614174000",
+                        "blogId": "789e0123-e89b-12d3-a456-426614174000",
+                        "createdAt": "2025-01-01T00:00:00Z",
+                        "updatedAt": "2025-01-01T00:00:00Z",
+                        "userInfo": {
+                          "id": "456e7890-e89b-12d3-a456-426614174000",
+                          "name": "John Doe",
+                          "email": "john@example.com"
+                        }
+                      }
+                    ],
+                    "count": 1
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid blog ID",
             "content": {
               "application/json": {
                 "schema": {

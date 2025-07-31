@@ -20,7 +20,6 @@ cloudinary.config({
 export const uploadFile = (file: Express.Multer.File): Promise<string> => {
   return new Promise((resolve, reject) => {
     if (!file) {
-      console.error("No file provided for upload");
       reject(new Error("No file provided for upload"));
       return;
     }
@@ -41,7 +40,6 @@ export const uploadFile = (file: Express.Multer.File): Promise<string> => {
       },
       (error, result) => {
         if (error) {
-          console.error("Cloudinary upload error:", error);
           reject(error);
           return;
         }
