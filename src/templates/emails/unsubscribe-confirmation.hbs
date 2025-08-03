@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unsubscribed from {{websiteName}}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            background-color: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        .header {
+            background: linear-gradient(135deg, #6c757d, #495057);
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 28px;
+        }
+        .content {
+            padding: 40px 30px;
+        }
+        .content h2 {
+            color: #6c757d;
+            margin-top: 0;
+        }
+        .button {
+            display: inline-block;
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            color: white;
+            padding: 15px 30px;
+            text-decoration: none;
+            border-radius: 25px;
+            margin: 20px 0;
+            font-weight: bold;
+            transition: transform 0.3s ease;
+        }
+        .button:hover {
+            transform: translateY(-2px);
+        }
+        .footer {
+            background-color: #f8f9fa;
+            text-align: center;
+            padding: 20px;
+            border-top: 1px solid #dee2e6;
+        }
+        .footer p {
+            margin: 5px 0;
+            font-size: 12px;
+            color: #666;
+        }
+        .resubscribe {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #e3f2fd;
+            border-radius: 5px;
+            border-left: 4px solid #007bff;
+            text-align: center;
+        }
+        .resubscribe p {
+            margin: 10px 0;
+            color: #0277bd;
+        }
+        .sad-icon {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="sad-icon">😢</div>
+            <h1>You've been unsubscribed</h1>
+        </div>
+        <div class="content">
+            <h2>Subscription Cancelled</h2>
+            <p>Hello{{#if email}} ({{email}}){{/if}},</p>
+            <p>We're sorry to see you go! You have been successfully unsubscribed from our newsletter.</p>
+            
+            <p><strong>What this means:</strong></p>
+            <ul>
+                <li>❌ You will no longer receive our newsletter emails</li>
+                <li>❌ You'll miss out on our latest blog posts and updates</li>
+                <li>❌ No more exclusive subscriber content</li>
+                <li>✅ Your email has been removed from our mailing list</li>
+            </ul>
+            
+            <p>We understand that inboxes can get overwhelming, and we respect your decision. If you unsubscribed by mistake or change your mind in the future, you can always subscribe again from our website.</p>
+            
+            <div style="text-align: center;">
+                <a href="{{websiteUrl}}" class="button">Visit Our Website</a>
+            </div>
+            
+            <div class="resubscribe">
+                <p><strong>Changed your mind?</strong></p>
+                <p>You can resubscribe anytime by visiting our website and signing up again.</p>
+            </div>
+        </div>
+        <div class="footer">
+            <p>&copy; {{currentYear}} {{websiteName}}. All rights reserved.</p>
+            <p>This confirmation email was sent to notify you of the unsubscription.</p>
+        </div>
+    </div>
+</body>
+</html>

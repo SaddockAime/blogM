@@ -9,6 +9,7 @@ import {
 import { ValidationMiddleware } from "../middleware/validationMiddleware";
 import { AddBlogSchema, UpdateBlogSchema, BlogParamsSchema } from '../schemas/blogSchema';
 import { authMiddleware, checkRole } from "../middleware/authMiddleware";
+import { blogNotificationMiddleware } from "../middleware/blogNotificationMiddleware";
 import { storage } from "../utils/upload";
 import multer from "multer";
 const uploadMiddleware = multer({storage})
@@ -26,6 +27,7 @@ blogRouter.post('/blogs',
     checkRole(['admin']),
     uploadMiddleware.single('image'),
     ValidationMiddleware({ type: 'body', schema: AddBlogSchema, refType: 'joi' }),
+    blogNotificationMiddleware,
     createBlog
 );
 

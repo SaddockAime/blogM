@@ -9,41 +9,45 @@ const request = supertest(app)
 
 describe('Like API Tests', () => {
     let blogId: string
-    let userToken: string
     let adminToken: string
 
-    beforeAll(async () => {
-        // Login as admin to create blog
-        const adminLoginRes = await request.post(`${prefix}login`).send({
-            email: 'john.doe@example.com',
-            password: 'password'
-        })
-        adminToken = adminLoginRes.body.data.token
-
-        userToken = adminToken
-
-        // Create a blog for testing likes
-        const blogRes = await request
-            .post(`${prefix}blogs`)
-            .set('Authorization', `Bearer ${adminToken}`)
-            .field('title', 'Blog for Likes Test')
-            .field('description', 'This is a test blog description with more than 20 characters for testing likes')
-            .field('content', 'Content for testing likes functionality')
-            .field('isPublished', 'true')
-
-        if (blogRes.status === 201) {
-            blogId = blogRes.body.data.id
-        } else {
-            // If blog creation fails, use a mock ID for testing error cases
-            blogId = '123e4567-e89b-12d3-a456-426614174000'
-        }
-    })
-
     describe('Like functionality tests', () => {
+        it("Login Succefully", async () => {
+          const res = await request.post(`${prefix}login`).send({
+            email: "aimegetz@gmail.com",
+            password: "password",
+          });
+          expect(res.body.message).toEqual("Login successful");
+          expect(res.body.success).toBe(true);
+          adminToken = res.body.data.token;
+        });
+
+        it("should create a blog successfully with admin role", async () => {
+          const blogData = {
+            title: "Test Blog Title2",
+            description:
+              "This is a test blog description with more than 20 characters",
+            content:
+              "This is the content of the test blog. It contains detailed information.",
+            isPublished: true,
+          };
+
+          const res = await request
+            .post(`${prefix}blogs`)
+            .set("Authorization", `Bearer ${adminToken}`)
+            .field("title", blogData.title)
+            .field("description", blogData.description)
+            .field("content", blogData.content)
+            .field("isPublished", blogData.isPublished.toString());
+
+          expect(res.status).toBe(201);
+          blogId = res.body.data.id;
+        });
+
         it('should like a blog successfully when not previously liked', async () => {
             const res = await request
                 .post(`${prefix}blogs/${blogId}/like`)
-                .set('Authorization', `Bearer ${userToken}`)
+                .set('Authorization', `Bearer ${adminToken}`)
 
             if (res.status === 201) {
                 expect(res.body.success).toBe(true)
@@ -59,7 +63,7 @@ describe('Like API Tests', () => {
         it('should unlike a blog when previously liked (toggle functionality)', async () => {
             const res = await request
                 .post(`${prefix}blogs/${blogId}/like`)
-                .set('Authorization', `Bearer ${userToken}`)
+                .set('Authorization', `Bearer ${adminToken}`)
 
             if (res.status === 200) {
                 expect(res.body.success).toBe(true)
@@ -71,7 +75,7 @@ describe('Like API Tests', () => {
         it('should like again after unliking (toggle functionality)', async () => {
             const res = await request
                 .post(`${prefix}blogs/${blogId}/like`)
-                .set('Authorization', `Bearer ${userToken}`)
+                .set('Authorization', `Bearer ${adminToken}`)
 
             if (res.status === 201) {
                 expect(res.body.success).toBe(true)
@@ -93,7 +97,7 @@ describe('Like API Tests', () => {
         it('should return 400 when blog ID is missing', async () => {
             const res = await request
                 .post(`${prefix}blogs//like`)
-                .set('Authorization', `Bearer ${userToken}`)
+                .set('Authorization', `Bearer ${adminToken}`)
 
             expect(res.status).toBe(404)
         })
@@ -102,7 +106,7 @@ describe('Like API Tests', () => {
             const nonExistentBlogId = '123e4567-e89b-12d3-a456-426614174999'
             const res = await request
                 .post(`${prefix}blogs/${nonExistentBlogId}/like`)
-                .set('Authorization', `Bearer ${userToken}`)
+                .set('Authorization', `Bearer ${adminToken}`)
 
             expect(res.status).toBe(404)
             expect(res.body.success).toBe(false)
@@ -140,7 +144,7 @@ describe('Like API Tests', () => {
 
             const res = await request
                 .post(`${prefix}blogs/${blogId}/like`)
-                .set('Authorization', `Bearer ${userToken}`)
+                .set('Authorization', `Bearer ${adminToken}`)
 
             expect(res.status).toBe(500)
         })
@@ -151,7 +155,7 @@ describe('Like API Tests', () => {
 
             const res = await request
                 .post(`${prefix}blogs/${blogId}/like`)
-                .set('Authorization', `Bearer ${userToken}`)
+                .set('Authorization', `Bearer ${adminToken}`)
 
             expect(res.status).toBe(500)
         })
@@ -163,7 +167,7 @@ describe('Like API Tests', () => {
 
             const res = await request
                 .post(`${prefix}blogs/${blogId}/like`)
-                .set('Authorization', `Bearer ${userToken}`)
+                .set('Authorization', `Bearer ${adminToken}`)
 
             expect(res.status).toBe(500)
         })
@@ -181,7 +185,7 @@ describe('Like API Tests', () => {
 
             const res = await request
                 .post(`${prefix}blogs/${blogId}/like`)
-                .set('Authorization', `Bearer ${userToken}`)
+                .set('Authorization', `Bearer ${adminToken}`)
 
             expect(res.status).toBe(500)
         })

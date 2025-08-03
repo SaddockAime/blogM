@@ -183,10 +183,15 @@ export const createBlog = async (req: IRequestBlog, res: Response) => {
             author: id,
             blog_image_url: image_url
         });
+
+        // Include author information in the response for the notification middleware
+        const blogWithAuthor = {
+            ...newBlog.toJSON(),
+            authorUser: author ? { name: author.name } : null
+        };
         
         ResponseService({
-            data: newBlog,
-            // data:null,
+            data: blogWithAuthor,
             status: 201,
             success: true,
             message: "Blog created successfully",

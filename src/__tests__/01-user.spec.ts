@@ -2,21 +2,21 @@ import supertest from 'supertest'
 import { it, describe, expect, jest, beforeAll } from '@jest/globals'
 import { prefix } from './setup'
 import { app } from '../server'
-import { userResponse } from './setup'
 import { User } from '../database/models/User'
 import * as helper from '../utils/helper'
 
 const request = supertest(app)
+let authToken: string
 
 describe('Login with admin token', () => {
     it('Login Succefully', async () => {
         const res = await request.post(`${prefix}login`).send({
-            email: 'john.doe@example.com',
+            email: 'aimegetz@gmail.com',
             password: 'password'
         })
-        userResponse.token = res.body.data
         expect(res.body.message).toEqual('Login successful')
         expect(res.body.success).toBe(true)
+        authToken = res.body.data.token
     })
     it('users Doesnt exist', async () => {
         const res = await request.post(`${prefix}login`).send({
@@ -28,7 +28,7 @@ describe('Login with admin token', () => {
     })
     it('invalid Password', async () => {
         const res = await request.post(`${prefix}login`).send({
-            email: 'john.doe@example.com',
+            email: 'aimegetz@gmail.com',
             password: 'passworrd'
         })
         expect(res.body.message).toEqual("Invalid email or password")
@@ -38,7 +38,7 @@ describe('Login with admin token', () => {
     it("getting 500 error", async () => {
       jest.spyOn(User, "findOne").mockRejectedValue(new Error());
       const res = await request.post(`${prefix}login`).send({
-        email: "john.doe@example.com",
+        email: "aimegetz@gmail.com",
         password: "password",
       });
       expect(res.status).toBe(500);
@@ -95,15 +95,6 @@ describe('create A user', () => {
 })
 
 describe('Logout functionality', () => {
-    let authToken: string
-
-    beforeAll(async () => {
-        const loginRes = await request.post(`${prefix}login`).send({
-            email: 'john.doe@example.com',
-            password: 'password'
-        })
-        authToken = loginRes.body.data.token
-    })
 
     it('should logout successfully with valid token', async () => {
         const res = await request
@@ -126,7 +117,7 @@ describe('Logout functionality', () => {
         jest.spyOn(helper, 'destroyToken').mockRejectedValue(new Error('Redis connection failed'))
 
         const loginRes = await request.post(`${prefix}login`).send({
-            email: 'john.doe@example.com',
+            email: 'aimegetz@gmail.com',
             password: 'password'
         })
         const freshToken = loginRes.body.data.token

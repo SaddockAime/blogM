@@ -17,7 +17,7 @@ redis.on('connect', () => {
 });
 
 redis.on('error', (err) => {
-    console.error('Redis connection error:', err);
+    console.log('Redis connection error:', err);
 });
 
 redis.on('ready', () => {

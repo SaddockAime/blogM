@@ -17,7 +17,7 @@ module.exports = {
       {
         id: uuidv4(),
         name: 'John Doe',
-        email: 'john.doe@example.com',
+        email: 'aimegetz@gmail.com',
         password: '$2b$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',// password
         role: 'admin',
         gender: 'male',

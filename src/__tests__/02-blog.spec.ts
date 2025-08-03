@@ -11,15 +11,17 @@ describe('Blog API Tests', () => {
     let blogId: string
     let adminToken: string
 
-    beforeAll(async () => {
-        const loginRes = await request.post(`${prefix}login`).send({
-            email: 'john.doe@example.com',
-            password: 'password'
-        })
-        adminToken = loginRes.body.data.token
-    })
-
     describe('Blogs tests', () => {
+        it("Login Succefully", async () => {
+          const res = await request.post(`${prefix}login`).send({
+            email: "aimegetz@gmail.com",
+            password: "password",
+          });
+          expect(res.body.message).toEqual("Login successful");
+          expect(res.body.success).toBe(true);
+          adminToken = res.body.data.token;
+        });
+        
         it('should return 404 when no blogs found', async () => {
             const res = await request
                 .get(`${prefix}blogs`)

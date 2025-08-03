@@ -54,6 +54,6 @@ export const destroyToken = async (token: string | undefined): Promise<void> => 
         await redis.setEx(`blacklist:${token}`, 24 * 60 * 60, 'true');
         
     } catch (error: any) {
-        console.error('Error destroying token:', error.message);
+        console.log('Error destroying token:', error.message);
     }
 }

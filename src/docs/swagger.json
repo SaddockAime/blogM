@@ -347,6 +347,46 @@
             "example": "This is a great blog post!"
           }
         }
+      },
+      "Subscriber": {
+        "type": "object",
+        "required": ["email"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Unique identifier for the subscriber"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "description": "Email address of the subscriber"
+          },
+          "isSubscribed": {
+            "type": "boolean",
+            "description": "Subscription status",
+            "default": true
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "SubscribeRequest": {
+        "type": "object",
+        "required": ["email"],
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "user@example.com"
+          }
+        }
       }
     }
   },
@@ -371,6 +411,10 @@
     {
       "name": "Likes",
       "description": "Like management operations"
+    },
+    {
+      "name": "Subscribers",
+      "description": "Newsletter subscription management"
     }
   ],
   "paths": {
@@ -1306,6 +1350,357 @@
           },
           "400": {
             "description": "Invalid blog ID",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/subscribers/subscribe": {
+      "post": {
+        "tags": ["Subscribers"],
+        "summary": "Subscribe to newsletter",
+        "description": "Subscribe an email address to the newsletter",
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SubscribeRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successfully subscribed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string",
+                              "format": "uuid"
+                            },
+                            "email": {
+                              "type": "string",
+                              "format": "email"
+                            },
+                            "isSubscribed": {
+                              "type": "boolean"
+                            },
+                            "subscribedAt": {
+                              "type": "string",
+                              "format": "date-time"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                },
+                "example": {
+                  "success": true,
+                  "status": 201,
+                  "message": "Successfully subscribed! A welcome email has been sent to your inbox.",
+                  "data": {
+                    "id": "123e4567-e89b-12d3-a456-426614174000",
+                    "email": "user@example.com",
+                    "isSubscribed": true,
+                    "subscribedAt": "2025-08-02T10:30:00Z"
+                  }
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Resubscribed successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "object",
+                          "properties": {
+                            "email": {
+                              "type": "string",
+                              "format": "email"
+                            },
+                            "isSubscribed": {
+                              "type": "boolean"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                },
+                "example": {
+                  "success": true,
+                  "status": 200,
+                  "message": "Welcome back! You have been resubscribed successfully and a confirmation email has been sent.",
+                  "data": {
+                    "email": "user@example.com",
+                    "isSubscribed": true
+                  }
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Email already subscribed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "success": false,
+                  "status": 409,
+                  "message": "This email is already subscribed to our newsletter"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/subscribers/unsubscribe": {
+      "get": {
+        "tags": ["Subscribers"],
+        "summary": "Unsubscribe from newsletter",
+        "description": "Unsubscribe an email address from the newsletter using a one-click link",
+        "security": [],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "email",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "email"
+            },
+            "description": "Email address to unsubscribe",
+            "example": "user@example.com"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully unsubscribed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "object",
+                          "properties": {
+                            "email": {
+                              "type": "string",
+                              "format": "email"
+                            },
+                            "isSubscribed": {
+                              "type": "boolean"
+                            },
+                            "unsubscribedAt": {
+                              "type": "string",
+                              "format": "date-time"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                },
+                "example": {
+                  "success": true,
+                  "status": 200,
+                  "message": "Successfully unsubscribed! A confirmation email has been sent.",
+                  "data": {
+                    "email": "user@example.com",
+                    "isSubscribed": false,
+                    "unsubscribedAt": "2025-08-02T10:30:00Z"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Email already unsubscribed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "success": false,
+                  "status": 400,
+                  "message": "This email is already unsubscribed"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Email not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "success": false,
+                  "status": 404,
+                  "message": "Email not found in our subscription list"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/subscribers": {
+      "get": {
+        "tags": ["Subscribers"],
+        "summary": "Get all subscribers (Admin only)",
+        "description": "Retrieve a paginated list of all subscribers with filtering options",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "page",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1
+            },
+            "description": "Page number for pagination"
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 10
+            },
+            "description": "Number of subscribers per page"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Subscribers retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "object",
+                          "properties": {
+                            "subscribers": {
+                              "type": "array",
+                              "items": {
+                                "$ref": "#/components/schemas/Subscriber"
+                              }
+                            },
+                            "pagination": {
+                              "type": "object",
+                              "properties": {
+                                "currentPage": {
+                                  "type": "integer"
+                                },
+                                "totalPages": {
+                                  "type": "integer"
+                                },
+                                "totalSubscribers": {
+                                  "type": "integer"
+                                },
+                                "limit": {
+                                  "type": "integer"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                },
+                "example": {
+                  "success": true,
+                  "status": 200,
+                  "message": "Subscribers retrieved successfully",
+                  "data": {
+                    "subscribers": [
+                      {
+                        "id": "123e4567-e89b-12d3-a456-426614174000",
+                        "email": "user1@example.com",
+                        "isSubscribed": true,
+                        "createdAt": "2025-08-02T10:30:00Z",
+                        "updatedAt": "2025-08-02T10:30:00Z"
+                      },
+                      {
+                        "id": "456e7890-e89b-12d3-a456-426614174000",
+                        "email": "user2@example.com",
+                        "isSubscribed": false,
+                        "createdAt": "2025-08-01T15:20:00Z",
+                        "updatedAt": "2025-08-02T09:15:00Z"
+                      }
+                    ],
+                    "pagination": {
+                      "currentPage": 1,
+                      "totalPages": 3,
+                      "totalSubscribers": 25,
+                      "limit": 10
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
             "content": {
               "application/json": {
                 "schema": {

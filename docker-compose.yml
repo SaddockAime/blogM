@@ -1,0 +1,104 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database - only external database needed
+  postgres:
+    image: postgres:15-alpine
+    container_name: blogm-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DEV_DATABASE:-blog-manager}
+      POSTGRES_USER: ${DEV_USERNAME:-postgres}
+      POSTGRES_PASSWORD: ${DEV_PASSWORD:-Saddock_2000}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - blogm-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DEV_USERNAME:-postgres} -d ${DEV_DATABASE:-blog-manager}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # RabbitMQ Message Queue for Email Notifications
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: blogm-rabbitmq
+    restart: unless-stopped
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:-admin}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASS:-admin}
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - blogm-network
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Main BlogM Application (includes API + Email Worker)
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: blogm-app
+    restart: unless-stopped
+    environment:
+      NODE_ENV: ${NODE_ENV:-development}
+      PORT: 5500
+      # Database
+      DEV_DATABASE: ${DEV_DATABASE:-blog-manager}
+      DEV_USERNAME: ${DEV_USERNAME:-postgres}
+      DEV_PASSWORD: ${DEV_PASSWORD:-Saddock_2000}
+      DEV_HOST: postgres
+      DEV_PORT: 5432
+      # External Redis (your cloud Redis)
+      REDIS_HOST: ${REDIS_HOST}
+      REDIS_PORT: ${REDIS_PORT}
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+      REDIS_DB: ${REDIS_DB}
+      # RabbitMQ (will use local if you want message queue)
+      RABBITMQ_URL: ${RABBITMQ_URL:-amqp://admin:admin@rabbitmq:5672}
+      # Email Configuration (your Gmail)
+      SMTP_HOST: ${SMTP_HOST}
+      SMTP_PORT: ${SMTP_PORT}
+      SMTP_USER: ${SMTP_USER}
+      SMTP_PASS: ${SMTP_PASS}
+      # Cloudinary
+      CLOUDINARY_API_SECRET: ${CLOUDINARY_API_SECRET}
+      CLOUDINARY_API_KEY: ${CLOUDINARY_API_KEY}
+      CLOUDINARY_API_NAME: ${CLOUDINARY_API_NAME}
+      # Google OAuth
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+      GOOGLE_CALLBACK_URL: ${GOOGLE_CALLBACK_URL}
+      # JWT Secret
+      JWT_SECRET: ${JWT_SECRET:-your-super-secret-jwt-key-change-in-production}
+    ports:
+      - "5500:5500"
+    volumes:
+      - ./uploads:/app/uploads
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - blogm-network
+
+volumes:
+  postgres_data:
+    driver: local
+  rabbitmq_data:
+    driver: local
+
+networks:
+  blogm-network:
+    driver: bridge
