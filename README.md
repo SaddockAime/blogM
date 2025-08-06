@@ -1,5 +1,7 @@
 # BlogM - Blog Management API
 
+[![Coverage Status](https://coveralls.io/repos/github/SaddockAime/blogM/badge.svg?branch=main)](https://coveralls.io/github/SaddockAime/blogM?branch=main)
+
 A TypeScript Node.js blog management system with authentication, file uploads, email notifications, and real-time features.
 
 ## Features

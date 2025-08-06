@@ -12,21 +12,31 @@ COPY package*.json ./
 COPY tsconfig.json ./
 COPY .sequelizerc ./
 
-# Install dependencies (including dev dependencies for building)
-RUN npm ci && npm cache clean --force
+# Install dependencies (keep dev dependencies for build)
+RUN npm ci
 
 # Copy source code and scripts
 COPY src/ ./src/
 COPY scripts/ ./scripts/
 
-# Build the application
+# Build the application (TypeScript compilation)
 RUN npm run build
 
-# Create uploads directory and set permissions
-RUN mkdir -p uploads && chown -R nodejs:nodejs /app
+# Manually copy templates (more reliable than copyfiles in Docker)
+# RUN mkdir -p dist/templates
+# RUN cp -r src/templates/* dist/templates/
+
+# # Verify templates were copied
+# RUN echo "Checking templates..." && ls -la dist/templates/
+
+# # Clean up dev dependencies and npm cache after build
+# RUN npm prune --production && npm cache clean --force
 
 # Make start script executable
 RUN chmod +x scripts/start.sh
+
+# Set ownership of the app directory to nodejs user
+# RUN chown -R nodejs:nodejs /app
 
 # Switch to non-root user
 USER nodejs

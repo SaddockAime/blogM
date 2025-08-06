@@ -1,8 +1,4 @@
-import multer from "multer";
-import { Request, Response } from "express";
 import { v2 as cloudinary } from "cloudinary";
-import { readFile } from "fs";
-import { join } from "path";
 import { config } from "dotenv";
 config();
 
@@ -24,15 +20,8 @@ export const uploadFile = (file: Express.Multer.File): Promise<string> => {
       return;
     }
 
-    const filePath = file.path;
-
-    if (!filePath) {
-      reject(new Error("File path not available"));
-      return;
-    }
-
-    cloudinary.uploader.upload(
-      filePath,
+    // Use buffer instead of file path for memory storage
+    cloudinary.uploader.upload_stream(
       {
         use_filename: true,
         unique_filename: false,
@@ -49,48 +38,6 @@ export const uploadFile = (file: Express.Multer.File): Promise<string> => {
         }
         resolve(result.secure_url);
       }
-    );
-  });
-};
-
-const getExtensation = (ext: string) => {
-  let ex = "";
-  switch (ext) {
-    case "image/jpeg":
-      ex = "jpg";
-      break;
-    case "image/png":
-      ex = "png";
-      break;
-    default:
-      ex = "jpg";
-  }
-  return ex;
-};
-const MulterFilterFile = (req: any, file: any, cb: any) => {
-  const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-  cb(null, uniqueSuffix + "-" + file.originalname);
-};
-
-export const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, "uploads/");
-  },
-  filename: MulterFilterFile,
-});
-interface RequestParams extends Request {
-  params: {
-    filename: string;
-  };
-}
-export const ReadFileName = (req: RequestParams, res: Response) => {
-  const { filename } = req.params;
-  const path = join(__dirname, "../../uploads/" + filename);
-  readFile(path, (error, result) => {
-    if (error) {
-      console.log(error);
-      res.send(error);
-    }
-    res.send(result);
+    ).end(file.buffer);
   });
 };

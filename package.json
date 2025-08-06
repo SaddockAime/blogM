@@ -8,10 +8,10 @@
   "main": "index.js",
   "scripts": {
     "test": "npm run db:migrate:undo:all && npm run db:migrate && npm run db:seed && jest --detectOpenHandles",
-    "test:watch": "npm run db:migrate:undo:all && npm run db:migrate && npm run db:seed && jest --detectOpenHandles --watch",
     "test:coverage": "npm run db:migrate:undo:all && npm run db:migrate && npm run db:seed && jest --detectOpenHandles --coverage",
+    "coveralls": "npm run test:coverage && coveralls < coverage/lcov.info",
     "dev": "nodemon src/server.ts",
-    "build": "tsc",
+    "build": "tsc && copyfiles -u 1 \"src/templates/**/*\" dist/",
     "start": "node dist/server.js",
     "db:migrate": "sequelize-cli db:migrate",
     "db:migrate:undo": "sequelize-cli db:migrate:undo",
@@ -27,7 +27,12 @@
     "docker:logs": "docker-compose logs -f",
     "docker:ps": "docker-compose ps",
     "docker:restart": "docker-compose restart",
-    "docker:stop": "docker-compose stop"
+    "docker:stop": "docker-compose stop",
+    "rabbitmq:up": "docker-compose up -d rabbitmq",
+    "rabbitmq:down": "docker-compose stop rabbitmq",
+    "rabbitmq:logs": "docker-compose logs -f rabbitmq",
+    "rabbitmq:restart": "docker-compose restart rabbitmq",
+    "rabbitmq:remove": "docker-compose rm -f rabbitmq"
   },
   "dependencies": {
     "@types/amqplib": "^0.10.7",
@@ -76,6 +81,8 @@
     "@types/swagger-ui-express": "^4.1.8",
     "@types/uuid": "^10.0.0",
     "babel-register": "^6.26.0",
+    "copyfiles": "^2.4.1",
+    "coveralls": "^3.1.1",
     "jest": "^30.0.5",
     "jest-mock-extended": "^4.0.0",
     "sequelize-cli": "^6.6.3",

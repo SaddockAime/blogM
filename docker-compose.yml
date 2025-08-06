@@ -83,8 +83,6 @@ services:
       JWT_SECRET: ${JWT_SECRET:-your-super-secret-jwt-key-change-in-production}
     ports:
       - "5500:5500"
-    volumes:
-      - ./uploads:/app/uploads
     depends_on:
       postgres:
         condition: service_healthy

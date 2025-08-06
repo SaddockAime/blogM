@@ -10,9 +10,9 @@ import { ValidationMiddleware } from "../middleware/validationMiddleware";
 import { AddBlogSchema, UpdateBlogSchema, BlogParamsSchema } from '../schemas/blogSchema';
 import { authMiddleware, checkRole } from "../middleware/authMiddleware";
 import { blogNotificationMiddleware } from "../middleware/blogNotificationMiddleware";
-import { storage } from "../utils/upload";
 import multer from "multer";
-const uploadMiddleware = multer({storage})
+
+const uploadMiddleware = multer({ storage: multer.memoryStorage() });
 const blogRouter = Router();
 
 blogRouter.get('/blogs', authMiddleware, getAllBlogs);

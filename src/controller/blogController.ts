@@ -3,8 +3,9 @@ import { ResponseService } from "../utils/response";
 import { GetAllBlogs, interfaceAddBlog, BlogInterface } from '../types/blogInterface';
 import { Database } from '../database';
 import { generateSlug } from '../utils/helper';
-import { IRequestUser } from '../middleware/authMiddleware';
 import { uploadFile } from '../utils/upload';
+import { IRequestUser } from '../middleware/authMiddleware';
+
 
 
 interface IRequestBlog extends IRequestUser {
@@ -162,6 +163,7 @@ export const createBlog = async (req: IRequestBlog, res: Response) => {
               });
             }
         }
+        
         const slug = generateSlug(title);
         const existingBlog = await Database.Blog.findOne({ where: { slug } });
         if (existingBlog) {
