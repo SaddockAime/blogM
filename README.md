@@ -127,7 +127,9 @@ npm test
 
 # Generate coverage report
 npm run test:coverage
-```
+
+# Upload coverage to Coveralls (local)
+npm run coveralls              # Smart upload with token check
 
 ## Project Structure
 
