@@ -23,9 +23,7 @@ describe('Blog API Tests', () => {
         });
         
         it('should return 404 when no blogs found', async () => {
-            const res = await request
-                .get(`${prefix}blogs`)
-                .set('Authorization', `Bearer ${adminToken}`)
+            const res = await request.get(`${prefix}blogs`)
             
             if (res.status === 404) {
                 expect(res.body.success).toBe(false)
@@ -77,10 +75,8 @@ describe('Blog API Tests', () => {
             expect(res.body.message).toEqual('A blog with this title already exists. Please use a different title.')
         })
 
-        it('should get all blogs with authentication', async () => {
-            const res = await request
-                .get(`${prefix}blogs`)
-                .set('Authorization', `Bearer ${adminToken}`)
+        it('should get all blogs', async () => {
+            const res = await request.get(`${prefix}blogs`)
             
             expect(res.status).toBe(200)
             expect(res.body.success).toBe(true)
@@ -157,23 +153,13 @@ describe('Blog API Tests', () => {
 
             expect(res.status).toBe(404)
         })
-
-        it('should return 401 without authentication', async () => {
-            const res = await request.get(`${prefix}blogs`)
-            
-            expect(res.status).toBe(401)
-        })
-
     })
 
     describe('Error Handling - Catch Block Tests', () => {
         it('should handle 500 error when getting all blogs', async () => {
             jest.spyOn(Blog, 'findAll').mockRejectedValue(new Error('Database error'))
 
-            const res = await request
-                .get(`${prefix}blogs`)
-                .set('Authorization', `Bearer ${adminToken}`)
-
+            const res = await request.get(`${prefix}blogs`)
             expect(res.status).toBe(500)
         })
 

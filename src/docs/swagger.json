@@ -689,6 +689,7 @@
         "tags": ["Blogs"],
         "summary": "Get all blogs",
         "description": "Retrieve a list of all blog posts",
+        "security": [],
         "responses": {
           "200": {
             "description": "Blogs retrieved successfully",
